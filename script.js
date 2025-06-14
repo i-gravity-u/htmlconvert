@@ -26,32 +26,39 @@ function convertToHTML() {
       const content = node.innerHTML.trim();
       const align = node.style.textAlign || getComputedStyle(node).textAlign;
 
+      // 빈 줄이거나 <br>만 있는 경우 처리
+      if (content === '' || content.toLowerCase() === '<br>') {
+        paragraphs.push('<p><br></p>');
+        return;
+      }
+
+      // --- 처리
       if (content === '---') {
         paragraphs.push(`
 <div class="align">
   <span class="dots"></span> <span class="dots"></span> <span class="dots"></span>
 </div>`);
-      } else if (content === '') {
-        paragraphs.push('<p>&nbsp;</p>');
-      } else {
-        // <br> 기준으로 잘라 여러 줄 문단으로 나눔
-        const lines = content.split(/<br\s*\/?>/i);
-        lines.forEach(line => {
-          const trimmed = line.trim();
-          if (trimmed) {
-            const style = align && align !== 'start' ? ` style="text-align:${align}"` : '';
-            // --- 포함된 줄 처리
-            if (trimmed === '---') {
-              paragraphs.push(`
+        return;
+      }
+
+      // 일반 문단 내용
+      const lines = content.split(/<br\s*\/?>/i);
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed) {
+          const style = align && align !== 'start' ? ` style="text-align:${align}"` : '';
+          if (trimmed === '---') {
+            paragraphs.push(`
 <div class="align">
   <span class="dots"></span> <span class="dots"></span> <span class="dots"></span>
 </div>`);
-            } else {
-              paragraphs.push(`<p${style}>${trimmed}</p>`);
-            }
+          } else {
+            paragraphs.push(`<p${style}>${trimmed}</p>`);
           }
-        });
-      }
+        } else {
+          paragraphs.push('<p><br></p>');  // 빈 줄도 p로 처리
+        }
+      });
 
     } else if (node.nodeType === 3 && node.textContent.trim() !== '') {
       const text = node.textContent.trim();
