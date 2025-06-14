@@ -27,12 +27,19 @@
           const content = node.innerHTML.trim();
           const align = node.style.textAlign || getComputedStyle(node).textAlign;
 
-          if (content === '') {
-            paragraphs.push('<p>&nbsp;</p>');
-          } else {
-            const style = align && align !== 'start' ? ` style="text-align:${align}"` : '';
-            paragraphs.push(`<p${style}>${content}</p>`);
-          }
+          // ---를 <div class="align">로 변환
+      if (content === '---') {
+        paragraphs.push(
+          `<div class="align">
+  <span class="dots"></span> <span class="dots"></span> <span class="dots"></span>
+</div>`
+        );
+      } else if (content === '') {
+        paragraphs.push('<p>&nbsp;</p>');
+      } else {
+        const style = align && align !== 'start' ? ` style="text-align:${align}"` : '';
+        paragraphs.push(`<p${style}>${content}</p>`);
+      }
         } else if (node.nodeType === 3 && node.textContent.trim() !== '') {
           paragraphs.push(`<p>${node.textContent.trim()}</p>`);
         }
